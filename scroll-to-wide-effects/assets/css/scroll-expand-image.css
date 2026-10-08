@@ -1,0 +1,153 @@
+/*
+ * SEI – Scroll Expand Image
+ *
+ * All sizes are driven by custom properties:
+ *   --sei-p        scroll progress 0 → 1 (set by JS)
+ *   --sei-w0/w1    start/end width      --sei-h0/h1  start/end height
+ *   --sei-r0/r1    start/end roundness (unitless 0–100, 100 = fully round)
+ *   --sei-section-height  scroll distance
+ * Elementor responsive controls override --sei-* per breakpoint.
+ * The --sei-d-* values below are the design defaults (used until a control sets a value).
+ */
+
+.sei {
+	--sei-p: 0;
+	--sei-d-section: 200vh;
+	--sei-d-w0: 70vw;
+	--sei-d-h0: 75vh;
+	--sei-d-r0: 6;
+
+	position: relative;
+	width: 100%;
+	height: var(--sei-section-height, var(--sei-d-section));
+}
+
+.sei__stage {
+	position: sticky;
+	top: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100vh;
+	overflow: hidden;
+}
+
+.sei__frame {
+	--sei-_w0: var(--sei-w0, var(--sei-d-w0));
+	--sei-_w1: var(--sei-w1, 100%);
+	--sei-_h0: var(--sei-h0, var(--sei-d-h0));
+	--sei-_h1: var(--sei-h1, 100%);
+	--sei-_r0: var(--sei-r0, var(--sei-d-r0));
+	--sei-_r1: var(--sei-r1, 0);
+	--sei-_ref: calc(min(var(--sei-_w0), var(--sei-_h0)) / 2);
+
+	position: relative;
+	box-sizing: border-box;
+	flex: none;
+	overflow: hidden;
+	width: calc(var(--sei-_w0) + (var(--sei-_w1) - var(--sei-_w0)) * var(--sei-p));
+	height: calc(var(--sei-_h0) + (var(--sei-_h1) - var(--sei-_h0)) * var(--sei-p));
+	/*
+	 * Roundness 0–100 → a share of half the START frame's shorter side, in px.
+	 * 100 = fully round (a circle on a square frame). The radius shrinks linearly in px
+	 * while the frame grows, so it fades out evenly instead of scaling with the frame.
+	 */
+	border-radius: calc(var(--sei-_ref) * (var(--sei-_r0) + (var(--sei-_r1) - var(--sei-_r0)) * var(--sei-p)) / 100);
+	will-change: width, height, border-radius;
+}
+
+/* Optional: start as a 1:1 box so roundness 100 is a perfect circle. */
+.sei-square-start-yes .sei__frame {
+	--sei-_s: min(var(--sei-w0, var(--sei-d-w0)), var(--sei-h0, var(--sei-d-h0)));
+	--sei-_w0: var(--sei-_s);
+	--sei-_h0: var(--sei-_s);
+}
+
+.sei .sei__frame .sei__img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	max-width: none;
+	object-fit: cover;
+}
+
+/* Overlay shade (background set by the "Image Overlay" controls). */
+.sei__shade {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+}
+
+/* Layer that positions the content box inside the frame. */
+.sei__layer {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	padding: 40px;
+	pointer-events: none;
+}
+
+.sei__content {
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 720px;
+	max-height: 100%;
+	text-align: center;
+	pointer-events: auto;
+}
+
+.sei__subtitle,
+.sei__title,
+.sei__text {
+	margin: 0;
+}
+
+.sei__title {
+	white-space: pre-line;
+}
+
+.sei__text > :first-child {
+	margin-top: 0;
+}
+
+.sei__text > :last-child {
+	margin-bottom: 0;
+}
+
+.sei__button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.sei__button-icon {
+	display: inline-flex;
+	align-items: center;
+	line-height: 1;
+}
+
+.sei__button-icon svg {
+	width: 1em;
+	height: 1em;
+}
+
+/* Mobile defaults (match the design). Elementor's responsive controls override these. */
+@media (max-width: 767px) {
+	.sei {
+		--sei-d-section: 170vh;
+		--sei-d-w0: 88vw;
+		--sei-d-h0: 65vh;
+		--sei-d-r0: 6;
+	}
+
+	.sei__layer {
+		padding: 20px;
+	}
+}

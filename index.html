@@ -1,0 +1,129 @@
+<section class="expand-image-section" id="expandImageSection">
+    <div class="expand-sticky">
+        <div class="expand-image" id="expandImage">
+            <img src="fuul-colorful-glass.webp" alt="">
+        </div>
+    </div>
+</section>
+
+
+<style>
+    /* فضای لازم برای اجرای انیمیشن اسکرول */
+    .expand-image-section {
+        position: relative;
+        height: 200vh;
+        width: 100%;
+    }
+
+    /* سکشن هنگام بزرگ شدن تصویر ثابت می‌ماند */
+    .expand-sticky {
+        position: sticky;
+        top: 0;
+        width: 100%;
+        height: 100vh;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        overflow: hidden;
+    }
+
+    /* وضعیت اولیه تصویر */
+    .expand-image {
+        width: 70vw;
+        height: 75vh;
+
+        overflow: hidden;
+        border-radius: 28px;
+
+        will-change: width, height, border-radius;
+    }
+
+    /* خود عکس */
+    .expand-image img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+    }
+
+
+    /* Mobile */
+    @media (max-width: 767px) {
+
+        .expand-image-section {
+            height: 170vh;
+        }
+
+        .expand-image {
+            width: 88vw;
+            height: 65vh;
+            border-radius: 20px;
+        }
+
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const section = document.getElementById("expandImageSection");
+        const image = document.getElementById("expandImage");
+
+        function updateExpandImage() {
+
+            const rect = section.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+
+            /*
+            progress:
+            0 = شروع انیمیشن
+            1 = تصویر کاملاً باز شده
+            */
+            const scrollableDistance = section.offsetHeight - windowHeight;
+
+            let progress = -rect.top / scrollableDistance;
+
+            progress = Math.min(Math.max(progress, 0), 1);
+
+
+            /* عرض از 70vw تا 100vw */
+            const startWidth = window.innerWidth <= 767 ? 88 : 70;
+            const endWidth = 100;
+
+            const currentWidth =
+                startWidth + ((endWidth - startWidth) * progress);
+
+
+            /* ارتفاع هم کمی بزرگ می‌شود */
+            const startHeight = window.innerWidth <= 767 ? 65 : 75;
+            const endHeight = 100;
+
+            const currentHeight =
+                startHeight + ((endHeight - startHeight) * progress);
+
+
+            /* حذف تدریجی radius */
+            const startRadius = window.innerWidth <= 767 ? 20 : 28;
+
+            const currentRadius =
+                startRadius * (1 - progress);
+
+
+            image.style.width = currentWidth + "vw";
+            image.style.height = currentHeight + "vh";
+            image.style.borderRadius = currentRadius + "px";
+        }
+
+
+        window.addEventListener("scroll", updateExpandImage, {
+            passive: true
+        });
+
+        window.addEventListener("resize", updateExpandImage);
+
+        updateExpandImage();
+
+    });
+</script>
